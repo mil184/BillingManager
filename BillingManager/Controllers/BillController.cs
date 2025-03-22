@@ -53,7 +53,8 @@ namespace Api.Controllers
             Bill bill = new Bill()
             {
                 DateTime = billDto.DateTime,
-                EmployeeId = billDto.EmployeeId,
+                EmployeeId = GuidHelper.GetGuidFromString(billDto.EmployeeId),
+                BillNumber = billDto.BillNumber
             };
 
 

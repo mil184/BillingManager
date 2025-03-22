@@ -37,7 +37,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uuid");
 
-                    b.Property<double>("TotalAmount")
+                    b.Property<double>("TotalPrice")
                         .HasColumnType("double precision");
 
                     b.Property<bool>("isPayed")

@@ -21,7 +21,7 @@ namespace Infrastructure.Service
 
         public void UpdateTotalPrice(Bill bill, double totalPrice)
         {
-            bill.TotalAmount = totalPrice;
+            bill.TotalPrice = totalPrice;
             Update(bill);
         }
 

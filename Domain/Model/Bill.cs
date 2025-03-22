@@ -2,15 +2,18 @@
 {
     public class Bill
     {
-        public Guid Id { get; set; } = new Guid();
+        public bool isPayed;
+
+        public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime DateTime { get; set; }
-        public double TotalAmount { get; set; } = 0;
-        public bool isPayed { get; set; } = false;
+        public double TotalPrice { get; set; } = 0;
+        public required string BillNumber { get; set; }
+        public bool IsPayed { get; set; } = false;
 
-        public Guid? EmployeeId { get; set; }
-        public Employee? Employee { get; set; }
+        public Guid EmployeeId { get; set; }
+        public Employee Employee { get; set; } = null!;
 
-        public IEnumerable<BillItem>? BillItems { get; set; } = new List<BillItem>();
+        public List<BillItem>? BillItems { get; set; } = new();
 
     }
 }
