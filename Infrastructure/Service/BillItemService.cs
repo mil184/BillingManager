@@ -1,0 +1,53 @@
+﻿using Domain.Model;
+using Domain.Repository;
+using Domain.Service;
+
+namespace Infrastructure.Service
+{
+    public class BillItemService : IBillItemService
+    {
+        private readonly IBillItemRepository _billItemRepository;
+        private readonly IBillService _billService;
+
+        public BillItemService(IBillItemRepository billItemRepository, IBillService billService)
+        {
+            _billItemRepository = billItemRepository;
+            _billService = billService;
+        }
+
+        private double CalculateBillItemPrice(BillItem billItem)
+        {
+            return billItem.Price * billItem.Amount;
+        }
+
+        public BillItem Create(BillItem billItem)
+        {
+            billItem.Price = CalculateBillItemPrice(billItem);
+            // bill update price 
+            return _billItemRepository.Create(billItem);
+        }
+
+        public IEnumerable<BillItem> GetAllByBill(Guid billId)
+        {
+            return GetAll().Where(x => x.BillId == billId);
+        }
+
+        private double CalculateBillItemsPrice(IEnumerable<BillItem> billItems)
+        {
+            return billItems.Sum(x => x.Price);
+        }
+
+        public void Delete(Guid id)
+        {
+            var billItem = _billItemRepository.GetById(id);
+            if (billItem != null)
+                _billItemRepository.Delete(billItem);
+        }
+
+        public IEnumerable<BillItem> GetAll() => _billItemRepository.GetAll();
+
+        public BillItem? GetById(Guid id) => _billItemRepository.GetById(id);
+
+        public void Update(BillItem billItem) => _billItemRepository.Update(billItem);
+    }
+}
