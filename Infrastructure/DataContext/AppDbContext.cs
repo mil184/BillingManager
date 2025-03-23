@@ -5,20 +5,20 @@ namespace Infrastructure.DataContext
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Bill> Bills { get; set; } = null!;
-        public DbSet<BillItem> BillItems { get; set; } = null!;
-        public DbSet<Product> Products { get; set; } = null!;
-        public DbSet<Employee> Employees { get; set; } = null!;
-        public DbSet<PaymentCard> PaymentCards { get; set; } = null!;
+        public DbSet<Bill> Bills { get; set; }
+        public DbSet<BillItem> BillItems { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<PaymentCard> PaymentCards { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Bill>()
-                .HasMany(e => e.BillItems)
-                .WithOne(e => e.Bill)
-                .HasForeignKey(e => e.BillId);
+                .HasMany(b => b.BillItems)
+                .WithOne(bi => bi.Bill)
+                .HasForeignKey(bi => bi.BillId);
 
             modelBuilder.Entity<BillItem>()
                 .HasOne(b => b.Product)
@@ -28,7 +28,8 @@ namespace Infrastructure.DataContext
             modelBuilder.Entity<Employee>()
                 .HasMany(e => e.Bills)
                 .WithOne(e => e.Employee)
-                .HasForeignKey(e => e.EmployeeId);
+                .HasForeignKey(e => e.EmployeeId)
+                .HasPrincipalKey(e => e.Id);
         }
     }
 }

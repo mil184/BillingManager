@@ -2,8 +2,6 @@
 {
     public class Bill
     {
-        public bool isPayed;
-
         public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime DateTime { get; set; }
         public double TotalPrice { get; set; } = 0;
@@ -13,7 +11,7 @@
         public Guid EmployeeId { get; set; }
         public Employee Employee { get; set; } = null!;
 
-        public List<BillItem>? BillItems { get; set; } = new();
+        public List<BillItem> BillItems { get; set; } = new List<BillItem>();
 
     }
 }

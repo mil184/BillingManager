@@ -14,7 +14,6 @@ namespace Infrastructure.Service
             _billItemRepository = billItemRepository;
             _billService = billService;
         }
-
         private double CalculateBillItemPrice(BillItem billItem)
         {
             return billItem.Price * billItem.Amount;
@@ -23,18 +22,11 @@ namespace Infrastructure.Service
         public BillItem Create(BillItem billItem)
         {
             billItem.Price = CalculateBillItemPrice(billItem);
-            // bill update price 
+
+            Bill bill = _billService.GetById(billItem.BillId)!;
+            _billService.UpdateTotalPrice(bill, billItem.Price);
+
             return _billItemRepository.Create(billItem);
-        }
-
-        public IEnumerable<BillItem> GetAllByBill(Guid billId)
-        {
-            return GetAll().Where(x => x.BillId == billId);
-        }
-
-        private double CalculateBillItemsPrice(IEnumerable<BillItem> billItems)
-        {
-            return billItems.Sum(x => x.Price);
         }
 
         public void Delete(Guid id)

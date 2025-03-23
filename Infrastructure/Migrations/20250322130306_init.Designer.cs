@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250320140016_relationship-fix")]
-    partial class relationshipfix
+    [Migration("20250322130306_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,11 +31,18 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("BillNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("EmployeeId")
+                    b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsPayed")
+                        .HasColumnType("boolean");
 
                     b.Property<double>("TotalPrice")
                         .HasColumnType("double precision");
@@ -56,13 +63,13 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("BillId")
+                    b.Property<Guid>("BillId")
                         .HasColumnType("uuid");
 
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid?>("ProductId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -81,6 +88,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
@@ -89,6 +97,25 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("Domain.Model.PaymentCard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Cvv")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Pan")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentCards");
                 });
 
             modelBuilder.Entity("Domain.Model.Product", b =>
@@ -113,7 +140,9 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Model.Employee", "Employee")
                         .WithMany("Bills")
-                        .HasForeignKey("EmployeeId");
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Employee");
                 });
@@ -122,11 +151,15 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Model.Bill", "Bill")
                         .WithMany("BillItems")
-                        .HasForeignKey("BillId");
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Model.Product", "Product")
                         .WithMany("BillItems")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Bill");
 

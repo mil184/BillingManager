@@ -7,25 +7,31 @@ namespace Infrastructure.Service
     public class BillService : IBillService
     {
         private readonly IBillRepository _billRepository;
+        private readonly IEmployeeService _employeeService;
 
-        public BillService(IBillRepository billRepository)
+        public BillService(IBillRepository billRepository, IEmployeeService employeeService)
         {
             _billRepository = billRepository;
+            _employeeService = employeeService;
         }
 
         public void ProcessBillPayment(Bill bill)
         {
-            bill.isPayed = true;
+            bill.IsPayed = true;
             Update(bill);
         }
 
-        public void UpdateTotalPrice(Bill bill, double totalPrice)
+        public void UpdateTotalPrice(Bill bill, double price)
         {
-            bill.TotalPrice = totalPrice;
+            bill.TotalPrice += price;
             Update(bill);
         }
 
-        public Bill Create(Bill bill) => _billRepository.Create(bill);
+        public Bill Create(Bill bill)
+        {
+            //bill.Employee = _employeeService.GetById(bill.EmployeeId);
+            return _billRepository.Create(bill);
+        }
 
         public void Delete(Guid id)
         {

@@ -16,7 +16,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -25,13 +25,25 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentCards",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Pan = table.Column<string>(type: "text", nullable: false),
+                    Cvv = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentCards", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false),
-                    BillItemId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Price = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,8 +56,10 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalAmount = table.Column<double>(type: "double precision", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: true)
+                    TotalPrice = table.Column<double>(type: "double precision", nullable: false),
+                    BillNumber = table.Column<string>(type: "text", nullable: false),
+                    IsPayed = table.Column<bool>(type: "boolean", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,7 +68,8 @@ namespace Infrastructure.Migrations
                         name: "FK_Bills_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,8 +79,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<int>(type: "integer", nullable: false),
                     Price = table.Column<double>(type: "double precision", nullable: false),
-                    BillId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: true)
+                    BillId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,12 +89,14 @@ namespace Infrastructure.Migrations
                         name: "FK_BillItems_Bills_BillId",
                         column: x => x.BillId,
                         principalTable: "Bills",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BillItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -90,8 +107,7 @@ namespace Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BillItems_ProductId",
                 table: "BillItems",
-                column: "ProductId",
-                unique: true);
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bills_EmployeeId",
@@ -104,6 +120,9 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BillItems");
+
+            migrationBuilder.DropTable(
+                name: "PaymentCards");
 
             migrationBuilder.DropTable(
                 name: "Bills");
