@@ -13,15 +13,16 @@ namespace Api.Controllers
     {
         private readonly IBillService _billService;
         private readonly IPaymentService _paymentService;
-        private readonly PaymentCardValidator _paymentCardValidator;
-        private readonly IBillPriceLimitService _billPriceLimitService;
 
-        public BillController(IBillService billService, IPaymentService paymentService, PaymentCardValidator paymentCardValidator, IBillPriceLimitService billPriceLimitService)
+        private readonly PaymentCardValidator _paymentCardValidator;
+        private readonly BillValidator _billValidator;
+
+        public BillController(IBillService billService, IPaymentService paymentService, PaymentCardValidator paymentCardValidator, BillValidator billValidator)
         {
             _billService = billService;
             _paymentService = paymentService;
             _paymentCardValidator = paymentCardValidator;
-            _billPriceLimitService = billPriceLimitService;
+            _billValidator = billValidator;
         }
 
         [HttpPut]
@@ -55,10 +56,15 @@ namespace Api.Controllers
             Bill bill = new Bill()
             {
                 DateTime = billDto.DateTime,
-                EmployeeId = billDto.EmployeeId,
-                BillNumber = "0000"
+                EmployeeId = GuidHelper.GetGuidFromString(billDto.EmployeeId),
+                BillNumber = billDto.BillNumber
             };
 
+            var validationResult = _billValidator.Validate(bill);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+            }
 
             var createdBill = _billService.Create(bill);
             return CreatedAtAction(nameof(GetById), new { id = createdBill.Id }, createdBill);

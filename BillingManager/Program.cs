@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql("Host=localhost;Port=5432;Database=billing_manager;Username=postgres;Password=super;IncludeErrorDetail=true"));
 
 builder.Services.AddScoped<PaymentCardValidator, PaymentCardValidator>();
+builder.Services.AddScoped<BillValidator, BillValidator>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
