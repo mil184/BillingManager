@@ -1,5 +1,6 @@
 ﻿using Domain.Model;
 using Domain.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -16,6 +17,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult<IEnumerable<Product>> GetAll()
         {
             return Ok(_productService.GetAll());
