@@ -13,6 +13,11 @@ namespace Infrastructure.Service
             _employeeRepository = employeeRepository;
         }
 
+        public Employee GetByName(string name)
+        {
+            return GetAll().FirstOrDefault(x => x.Name == name);
+        }
+
         public Employee Create(Employee employee) => _employeeRepository.Create(employee);
 
         public void Delete(Guid id)

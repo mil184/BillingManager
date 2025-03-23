@@ -17,7 +17,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<IEnumerable<Product>> GetAll()
         {
             return Ok(_productService.GetAll());
