@@ -19,7 +19,7 @@ namespace Infrastructure.Service
 
         public string GenerateToken(Employee employee)
         {
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("cc616ed33b0889a5f3ce1c6ca25dec0768c5b0835600e66285595a1ce91aff73"));
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
@@ -29,10 +29,10 @@ namespace Infrastructure.Service
             };
 
             var token = new JwtSecurityToken(
-                "https://localhost:7121",
-                "BillingManager",
+                _configuration["JwtSettings:Issuer"],
+                _configuration["JwtSettings:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:DurationInMinutes"])),
                 signingCredentials: credentials
             );
 

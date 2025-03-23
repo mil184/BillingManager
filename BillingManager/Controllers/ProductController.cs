@@ -1,11 +1,10 @@
 ﻿using Domain.Model;
 using Domain.Service;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [Route("api/products/")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -17,7 +16,6 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<IEnumerable<Product>> GetAll()
         {
             return Ok(_productService.GetAll());
