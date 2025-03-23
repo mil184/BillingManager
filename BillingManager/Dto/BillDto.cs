@@ -3,7 +3,6 @@
     public record BillDto
     {
         public DateTime DateTime { get; set; }
-        public required string EmployeeId { get; set; }
         public required string BillNumber { get; set; }
 
     }

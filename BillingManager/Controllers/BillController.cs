@@ -5,6 +5,8 @@ using Domain.Model;
 using Domain.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -55,10 +57,15 @@ namespace Api.Controllers
                 return BadRequest();
             }
 
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var employeeId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
             Bill bill = new Bill()
             {
                 DateTime = billDto.DateTime,
-                EmployeeId = GuidHelper.GetGuidFromString(billDto.EmployeeId),
+                EmployeeId = GuidHelper.GetGuidFromString(employeeId),
                 BillNumber = billDto.BillNumber
             };
 

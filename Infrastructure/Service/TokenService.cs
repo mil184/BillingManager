@@ -25,6 +25,7 @@ namespace Infrastructure.Service
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, employee.Name),
+                new Claim(ClaimTypes.NameIdentifier, employee.Id.ToString()),
                 new Claim(ClaimTypes.Role, employee.Role.ToString())
             };
 
