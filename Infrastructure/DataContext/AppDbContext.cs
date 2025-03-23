@@ -10,6 +10,7 @@ namespace Infrastructure.DataContext
         public DbSet<Product> Products { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PaymentCard> PaymentCards { get; set; }
+        public DbSet<BillPriceLimit> BillPriceLimits { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

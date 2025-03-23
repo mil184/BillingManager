@@ -14,12 +14,14 @@ namespace Api.Controllers
         private readonly IBillService _billService;
         private readonly IPaymentService _paymentService;
         private readonly PaymentCardValidator _paymentCardValidator;
+        private readonly IBillPriceLimitService _billPriceLimitService;
 
-        public BillController(IBillService billService, IPaymentService paymentService, PaymentCardValidator paymentCardValidator)
+        public BillController(IBillService billService, IPaymentService paymentService, PaymentCardValidator paymentCardValidator, IBillPriceLimitService billPriceLimitService)
         {
             _billService = billService;
             _paymentService = paymentService;
             _paymentCardValidator = paymentCardValidator;
+            _billPriceLimitService = billPriceLimitService;
         }
 
         [HttpPut]

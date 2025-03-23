@@ -4,6 +4,7 @@
     using Api.Helper;
     using Domain.Model;
     using Domain.Service;
+    using Infrastructure.Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using System;
     using System.Collections.Generic;
@@ -50,8 +51,15 @@
                     ProductId = productId
                 };
 
-                var createdBillItem = _billItemService.Create(billItem);
-                return Ok(createdBillItem);
+                try
+                {
+                    var createdBillItem = _billItemService.Create(billItem);
+                    return Ok(createdBillItem);
+                }
+                catch (BillAmountExceedsLimitException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
 
             [HttpPut("{id}")]
