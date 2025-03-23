@@ -54,6 +54,7 @@ namespace Api.Controllers
             {
                 DateTime = billDto.DateTime,
                 EmployeeId = billDto.EmployeeId,
+                BillNumber = "0000"
             };
 
 

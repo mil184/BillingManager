@@ -15,13 +15,13 @@ namespace Infrastructure.Service
 
         public void ProcessBillPayment(Bill bill)
         {
-            bill.isPayed = true;
+            bill.IsPayed = true;
             Update(bill);
         }
 
-        public void UpdateTotalPrice(Bill bill, double totalPrice)
+        public void UpdateTotalPrice(Bill bill, double price)
         {
-            bill.TotalAmount = totalPrice;
+            bill.TotalAmount += price;
             Update(bill);
         }
 

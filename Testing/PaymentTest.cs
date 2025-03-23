@@ -36,7 +36,7 @@ namespace Testing
                 Cvv = "456"
             };
 
-            Bill mockBill = new Bill();
+            Bill mockBill = new Bill() { BillNumber = "1010" };
 
             _billService.Setup(s => s.GetById(It.IsAny<Guid>())).Returns(mockBill);
             _billService.Setup(s => s.ProcessBillPayment(It.IsAny<Bill>()));

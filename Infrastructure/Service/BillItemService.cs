@@ -8,22 +8,26 @@ namespace Infrastructure.Service
     {
         private readonly IBillItemRepository _billItemRepository;
         private readonly IBillService _billService;
+        private readonly IProductService _productService;
 
-        public BillItemService(IBillItemRepository billItemRepository, IBillService billService)
+        public BillItemService(IBillItemRepository billItemRepository, IBillService billService, IProductService productService)
         {
             _billItemRepository = billItemRepository;
             _billService = billService;
+            _productService = productService;
         }
 
         private double CalculateBillItemPrice(BillItem billItem)
         {
-            return billItem.Price * billItem.Amount;
+            Product product = _productService.GetById(billItem.ProductId)!;
+            return product.Price * billItem.Amount;
         }
 
         public BillItem Create(BillItem billItem)
         {
             billItem.Price = CalculateBillItemPrice(billItem);
-            // bill update price 
+            Bill bill = _billService.GetById(billItem.BillId)!;
+            _billService.UpdateTotalPrice(bill, billItem.Price);
             return _billItemRepository.Create(billItem);
         }
 

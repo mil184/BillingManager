@@ -6,6 +6,6 @@
         public required string Name { get; set; }
         public double Price { get; set; }
 
-        public IEnumerable<BillItem> BillItems { get; set; } = new List<BillItem>();
+        //public IEnumerable<BillItem> BillItems { get; set; } = new List<BillItem>();
     }
 }

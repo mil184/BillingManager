@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250320205328_payment-card")]
-    partial class paymentcard
+    [Migration("20250323110531_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,21 +31,23 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("BillNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsPayed")
+                        .HasColumnType("boolean");
+
                     b.Property<double>("TotalAmount")
                         .HasColumnType("double precision");
 
-                    b.Property<bool>("isPayed")
-                        .HasColumnType("boolean");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Bills");
                 });
@@ -59,20 +61,16 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("BillId")
+                    b.Property<Guid>("BillId")
                         .HasColumnType("uuid");
 
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid?>("ProductId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BillId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("BillItems");
                 });
@@ -129,45 +127,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Domain.Model.Bill", b =>
-                {
-                    b.HasOne("Domain.Model.Employee", "Employee")
-                        .WithMany("Bills")
-                        .HasForeignKey("EmployeeId");
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("Domain.Model.BillItem", b =>
-                {
-                    b.HasOne("Domain.Model.Bill", "Bill")
-                        .WithMany("BillItems")
-                        .HasForeignKey("BillId");
-
-                    b.HasOne("Domain.Model.Product", "Product")
-                        .WithMany("BillItems")
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Bill");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Model.Bill", b =>
-                {
-                    b.Navigation("BillItems");
-                });
-
-            modelBuilder.Entity("Domain.Model.Employee", b =>
-                {
-                    b.Navigation("Bills");
-                });
-
-            modelBuilder.Entity("Domain.Model.Product", b =>
-                {
-                    b.Navigation("BillItems");
                 });
 #pragma warning restore 612, 618
         }

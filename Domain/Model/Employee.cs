@@ -8,6 +8,6 @@ namespace Domain.Model
         public string? Name { get; set; }
         public EmployeeRole Role { get; set; }
 
-        public IEnumerable<Bill>? Bills { get; set; } = new List<Bill>();
+        //public IEnumerable<Bill>? Bills { get; set; } = new List<Bill>();
     }
 }
