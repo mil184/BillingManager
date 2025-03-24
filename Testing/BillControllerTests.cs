@@ -4,8 +4,11 @@ using Api.Validation;
 using Domain.Model;
 using Domain.Service;
 using FakeItEasy;
+using Infrastructure.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Testing
 {
@@ -20,6 +23,8 @@ namespace Testing
         private readonly BillController _controller;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly ITokenService _tokenService;
 
         public BillControllerTests()
         {
@@ -40,95 +45,48 @@ namespace Testing
             A.CallTo(() => _httpContextAccessor.HttpContext).Returns(httpContext);
 
             _controller = new BillController(_billService, _paymentService, _paymentCardValidator, _billValidator);
+
+            _tokenService = new TokenService();
         }
 
         [Fact]
         public void BillController_Create_ReturnOk()
         {
-            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "12345" };
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "260-0056010016113-79" };
             Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = billDto.DateTime, BillNumber = billDto.BillNumber };
+            Employee employee = new Employee() { Id = Guid.NewGuid(), Name = "Milica", Role = Domain.Enum.EmployeeRole.CashRegisterOfficer };
 
-            //A.CallTo(() => _billValidator.Validate(A<Bill>._)).Returns(new ValidationResult());
-            var validationResult = _billValidator.Validate(bill);
             A.CallTo(() => _billService.Create(A<Bill>._)).Returns(bill);
 
+            var fakeJwtToken = new JwtSecurityToken(
+                claims: [new Claim(ClaimTypes.NameIdentifier, employee.Id.ToString())]
+                 );
+
+            var handler = new JwtSecurityTokenHandler();
+            var tokenString = handler.WriteToken(fakeJwtToken);
+
+            var fakeHttpContext = A.Fake<HttpContext>();
+            var fakeRequest = A.Fake<HttpRequest>();
+            var fakeHeaders = new HeaderDictionary { { "Authorization", $"Bearer {tokenString}" } };
+
+            A.CallTo(() => fakeHttpContext.Request).Returns(fakeRequest);
+            A.CallTo(() => fakeRequest.Headers).Returns(fakeHeaders);
+
+            _controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = fakeHttpContext
+            };
+
+            // Act
             var result = _controller.Create(billDto);
 
-            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result.Result);
-            Assert.Equal(bill.Id, ((Bill)createdAtActionResult.Value).Id);
+            // Assert
+            var createdAtActionResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnedBill = Assert.IsType<Bill>(createdAtActionResult.Value);
+            Assert.Equal(bill.Id, returnedBill.Id);
         }
 
-        //public PaymentTest()
-        //{
-        //    _billService = new Mock<IBillService>();
-        //    _paymentCardValidator = new PaymentCardValidator();
-        //    _paymentService = new Mock<IPaymentService>();
 
-        //    _billController = new BillController(_billService.Object, _paymentService.Object, _paymentCardValidator);
-        //}
-
-        //[Fact]
-        //public void Test_ValidPayment_ShouldProcessPayment()
-        //{
-        //    // Arrange
-        //    PaymentDto validPayment = new PaymentDto()
-        //    {
-        //        BillId = "656EE4CB-AB2A-4596-8DF4-6299DF7CFB66",
-        //        Pan = "5500000000000004",
-        //        Cvv = "456"
-        //    };
-
-        //    Bill mockBill = new Bill() { BillNumber = "1010" };
-
-        //    _billService.Setup(s => s.GetById(It.IsAny<Guid>())).Returns(mockBill);
-        //    _billService.Setup(s => s.ProcessBillPayment(It.IsAny<Bill>()));
-
-        //    var validationResult = _paymentCardValidator.Validate(validPayment);
-
-        //    _paymentService
-        //        .Setup(s => s.CheckPaymentCardInformation(validPayment.Pan, validPayment.Cvv))
-        //        .Returns(true);
-
-        //    // Act
-        //    var result = _controller.PayWithCard(validPayment);
-
-        //    // Assert
-        //    Assert.IsType<OkResult>(result);
-        //}
-
-        // 
-
-        //[Fact]
-        //public void Test_InvalidPayment_NoPan()
-        //{
-        //    // Arrange
-        //    PaymentDto invalidPayment = new PaymentDto()
-        //    {
-        //        BillId = "656EE4CB-AB2A-4596-8DF4-6299DF7CFB66",
-        //        Pan = "",
-        //        Cvv = "456"
-        //    };
-
-        //    Bill mockBill = new Bill();
-
-        //    _billService.Setup(s => s.GetById(It.IsAny<Guid>())).Returns(mockBill);
-        //    _billService.Setup(s => s.ProcessBillPayment(It.IsAny<Bill>()));
-
-        //    var validationResult = _paymentCardValidator.Validate(invalidPayment);
-
-        //    _paymentService
-        //        .Setup(s => s.CheckPaymentCardInformation(invalidPayment.Pan, invalidPayment.Cvv))
-        //        .Returns(true);
-
-        //    // Act
-        //    var result = _billController.PayWithCard(invalidPayment);
-
-        //    // Assert
-        //    var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        //    var errorMessages = badRequestResult.Value as IEnumerable<string>;
-
-        //    // Assert that the error message contains "Pan" being required
-        //    Assert.Contains("Pan is required", errorMessages);
-        //}
     }
 }

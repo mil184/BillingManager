@@ -91,15 +91,27 @@ namespace Api.Controllers
         [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<Bill> GetById(Guid id)
         {
-            var bill = _billService.GetById(id);
-            return bill != null ? Ok(bill) : NotFound();
+            Bill? bill = _billService.GetById(id);
+
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(bill);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "CashRegisterOfficer")]
-        public IActionResult Update(Guid id, Bill bill)
+        public IActionResult Update(Guid id, BillDto billDto)
         {
-            if (id != bill.Id) return BadRequest();
+            Bill? bill = _billService.GetById(id);
+
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
             _billService.Update(bill);
             return NoContent();
         }
@@ -108,6 +120,13 @@ namespace Api.Controllers
         [Authorize(Roles = "CashRegisterOfficer")]
         public IActionResult Delete(Guid id)
         {
+            Bill? bill = _billService.GetById(id);
+
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
             _billService.Delete(id);
             return NoContent();
         }
