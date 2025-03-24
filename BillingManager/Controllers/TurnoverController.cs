@@ -1,7 +1,10 @@
 ﻿using Api.Helper;
 using Domain.Model;
 using Domain.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -17,17 +20,24 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<BillPriceLimit> Create(double limit)
         {
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var employeeId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
             BillPriceLimit billPriceLimit = new BillPriceLimit()
             {
                 BillUpperLimit = limit,
                 DateAdded = DateTime.UtcNow,
-                EmployeeId = GuidHelper.GetGuidFromString("710a0a89-e30f-455c-99ac-6c7d9cbdec57")
+                EmployeeId = GuidHelper.GetGuidFromString(employeeId)
             };
 
             var createdBillPriceLimit = _billPriceLimitService.Create(billPriceLimit);
-            return CreatedAtAction(nameof(GetNewest), createdBillPriceLimit);
+            //return CreatedAtAction(nameof(GetNewest), createdBillPriceLimit);
+            return Ok(createdBillPriceLimit);
         }
 
         [HttpGet]

@@ -3,6 +3,7 @@ using Api.Helper;
 using Domain.Model;
 using Domain.Service;
 using Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -21,12 +22,14 @@ namespace Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<IEnumerable<BillItem>> GetAll()
         {
             return Ok(_billItemService.GetAll());
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<BillItem> GetById(Guid id)
         {
             var billItem = _billItemService.GetById(id);
@@ -34,6 +37,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public ActionResult<BillItem> Create(BillItemDto billItemDto)
         {
             Guid billId = GuidHelper.GetGuidFromString(billItemDto.BillId);
@@ -58,6 +62,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public IActionResult Update(Guid id, BillItem billItem)
         {
             if (id != billItem.Id) return BadRequest();
@@ -66,6 +71,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "CashRegisterOfficer")]
         public IActionResult Delete(Guid id)
         {
             _billItemService.Delete(id);

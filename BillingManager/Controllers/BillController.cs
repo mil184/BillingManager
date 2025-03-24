@@ -76,7 +76,8 @@ namespace Api.Controllers
             }
 
             var createdBill = _billService.Create(bill);
-            return CreatedAtAction(nameof(GetById), new { id = createdBill.Id }, createdBill);
+            //return CreatedAtAction(nameof(GetById), new { id = createdBill.Id }, createdBill);
+            return Ok(createdBill);
         }
 
         [HttpGet]
