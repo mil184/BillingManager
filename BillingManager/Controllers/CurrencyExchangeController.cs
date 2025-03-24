@@ -2,6 +2,7 @@
 using Api.Helper;
 using Domain.Enum;
 using Domain.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -18,6 +19,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ExchangeOfficer")]
         public async Task<ActionResult<string>> GetExchange([FromBody] CurrencyConversionDto currencyConversionDto)
         {
             Currency baseCurrency = CurrencyHelper.GetCurrencyFromString(currencyConversionDto.baseCurrency);

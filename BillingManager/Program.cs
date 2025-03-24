@@ -30,9 +30,10 @@ builder.Services.AddScoped<IBillItemService, BillItemService>();
 builder.Services.AddScoped<IBillService, BillService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
-builder.Services.AddScoped<IBillPriceLimitService, BillPriceLimitService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IBillPriceLimitService, BillPriceLimitService>();
+builder.Services.AddHttpClient<ICurrencyExchangeService, CurrencyExchangeService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

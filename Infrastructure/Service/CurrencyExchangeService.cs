@@ -1,15 +1,24 @@
 ﻿using Domain.Enum;
 using Domain.Service;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace Infrastructure.Service
 {
     public class CurrencyExchangeService : ICurrencyExchangeService
     {
-        private readonly HttpClient _client = new HttpClient();
-        private const string API_KEY = "a431120ba4mshf3948c89893233cp1c5610jsncd5b2ee17404";
-        private const string API_HOST = "currency-conversion-and-exchange-rates.p.rapidapi.com";
-        private const string BASE_URL = "https://currency-conversion-and-exchange-rates.p.rapidapi.com/convert?";
+        private readonly HttpClient _client;
+        private readonly string _apiKey;
+        private readonly string _apiHost;
+        private readonly string _baseUrl;
+
+        public CurrencyExchangeService(IConfiguration configuration, HttpClient client)
+        {
+            _client = client;
+            _apiKey = configuration["CurrencyExchange:ApiKey"] ?? throw new ArgumentNullException("API Key is missing in appsettings.json");
+            _apiHost = configuration["CurrencyExchange:ApiHost"] ?? throw new ArgumentNullException("API Host is missing in appsettings.json");
+            _baseUrl = configuration["CurrencyExchange:BaseUrl"] ?? throw new ArgumentNullException("Base URL is missing in appsettings.json");
+        }
 
         public async Task<string> FetchData(Currency baseCurrency, Currency targetCurrency, double amount)
         {
@@ -17,12 +26,11 @@ namespace Infrastructure.Service
             HttpRequestMessage request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(BASE_URL + $"from={baseCurrency.ToString()}&to={targetCurrency.ToString()}&amount={amount}"),
-                //RequestUri = new Uri("https://currency-conversion-and-exchange-rates.p.rapidapi.com/convert?from=USD&to=EUR&amount=750"),
+                RequestUri = new Uri(_baseUrl + $"from={baseCurrency.ToString()}&to={targetCurrency.ToString()}&amount={amount}"),
                 Headers =
                 {
-                    { "x-rapidapi-key", API_KEY },
-                    { "x-rapidapi-host", API_HOST },
+                    { "x-rapidapi-key", _apiKey },
+                    { "x-rapidapi-host", _apiHost },
                 }
             };
             using (var response = await _client.SendAsync(request))
@@ -44,7 +52,7 @@ namespace Infrastructure.Service
                 using JsonDocument doc = JsonDocument.Parse(body);
                 if (doc.RootElement.TryGetProperty("result", out JsonElement resultElement) && resultElement.TryGetDouble(out double convertedAmount))
                 {
-                    return convertedAmount; // Returning a proper numeric value
+                    return convertedAmount;
                 }
             }
             catch (JsonException ex)
@@ -52,7 +60,7 @@ namespace Infrastructure.Service
                 Console.WriteLine($"JSON Parsing Error: {ex.Message}");
             }
 
-            return null; // Returning null instead of empty string
+            return null;
         }
     }
 }
