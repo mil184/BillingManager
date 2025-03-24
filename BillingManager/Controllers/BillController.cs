@@ -54,7 +54,14 @@ namespace Api.Controllers
         {
             if (billDto == null)
             {
-                return BadRequest();
+                return BadRequest(new List<string> { "BillDto cannot be null." });
+            }
+
+            var validationResult = _billValidator.Validate(billDto);
+            if (!validationResult.IsValid)
+            {
+                var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(errorMessages);
             }
 
             var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -68,12 +75,6 @@ namespace Api.Controllers
                 EmployeeId = GuidHelper.GetGuidFromString(employeeId),
                 BillNumber = billDto.BillNumber
             };
-
-            var validationResult = _billValidator.Validate(bill);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
-            }
 
             var createdBill = _billService.Create(bill);
             //return CreatedAtAction(nameof(GetById), new { id = createdBill.Id }, createdBill);
@@ -103,7 +104,7 @@ namespace Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "CashRegisterOfficer")]
-        public IActionResult Update(Guid id, BillDto billDto)
+        public async Task<ActionResult> Update(Guid id, BillDto billDto)
         {
             Bill? bill = _billService.GetById(id);
 
@@ -113,12 +114,12 @@ namespace Api.Controllers
             }
 
             _billService.Update(bill);
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "CashRegisterOfficer")]
-        public IActionResult Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             Bill? bill = _billService.GetById(id);
 
@@ -128,7 +129,7 @@ namespace Api.Controllers
             }
 
             _billService.Delete(id);
-            return NoContent();
+            return Ok();
         }
     }
 

@@ -87,6 +87,139 @@ namespace Testing
             Assert.Equal(bill.Id, returnedBill.Id);
         }
 
+        [Fact]
+        public void BillController_Create_ReturnBadRequest_WhenBillDtoIsNull()
+        {
+            // Arrange
+            BillDto nullBillDto = null;
+
+            // Act
+            var result = _controller.Create(nullBillDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var errorMessages = Assert.IsType<List<string>>(badRequestResult.Value);
+            Assert.Contains("BillDto cannot be null.", errorMessages);
+        }
+
+        [Fact]
+        public void BillController_Create_ReturnBadRequest_WhenBillDtoIsInvalid()
+        {
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "12345" };
+
+            // Act
+            var result = _controller.Create(billDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var errorMessages = Assert.IsType<List<string>>(badRequestResult.Value);
+            Assert.Contains("Invalid bill number.", errorMessages);
+        }
+
+        [Fact]
+        public void BillController_GetAll_ReturnOk()
+        {
+            // Arrange
+            var bills = new List<Bill>();
+            A.CallTo(() => _billService.GetAll()).Returns(bills);
+
+            // Act
+            var result = _controller.GetAll();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnedBills = Assert.IsType<List<Bill>>(okResult.Value);
+        }
+
+        [Fact]
+        public void BillController_GetById_ReturnOk()
+        {
+            // Arrange
+            Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = DateTime.Now, BillNumber = "12345" };
+            A.CallTo(() => _billService.GetById(bill.Id)).Returns(bill);
+
+            // Act
+            var result = _controller.GetById(bill.Id);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnedBill = Assert.IsType<Bill>(okResult.Value);
+        }
+
+        [Fact]
+        public void BillController_GetById_ReturnNotFound()
+        {
+            // Arrange
+            Guid billId = Guid.NewGuid();
+            A.CallTo(() => _billService.GetById(billId)).Returns(null);
+
+            // Act
+            var result = _controller.GetById(billId);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public void BillController_Update_ReturnOk()
+        {
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "260-0056010016113-79" };
+            Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = billDto.DateTime, BillNumber = billDto.BillNumber };
+            A.CallTo(() => _billService.GetById(bill.Id)).Returns(bill);
+
+            // Act
+            var result = _controller.Update(bill.Id, billDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkResult>(result.Result);
+        }
+
+        [Fact]
+        public void BillController_Update_ReturnNotFound()
+        {
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "260-0056010016113-79" };
+            Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = billDto.DateTime, BillNumber = billDto.BillNumber };
+            A.CallTo(() => _billService.GetById(bill.Id)).Returns(null);
+
+            // Act
+            var result = _controller.Update(bill.Id, billDto);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public void BillController_Delete_ReturnOk()
+        {
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "260-0056010016113-79" };
+            Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = billDto.DateTime, BillNumber = billDto.BillNumber };
+            A.CallTo(() => _billService.GetById(bill.Id)).Returns(bill);
+
+            // Act
+            var result = _controller.Delete(bill.Id);
+
+            // Assert
+            var okResult = Assert.IsType<OkResult>(result.Result);
+        }
+
+        [Fact]
+        public void BillController_Delete_ReturnNotFound()
+        {
+            // Arrange
+            BillDto billDto = new BillDto { DateTime = DateTime.Now, BillNumber = "260-0056010016113-79" };
+            Bill bill = new Bill { Id = Guid.NewGuid(), DateTime = billDto.DateTime, BillNumber = billDto.BillNumber };
+            A.CallTo(() => _billService.GetById(bill.Id)).Returns(null);
+
+            // Act
+            var result = _controller.Delete(bill.Id);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
+        }
 
     }
 }

@@ -1,9 +1,9 @@
-﻿using Domain.Model;
+﻿using Api.Dto;
 using FluentValidation;
 
 namespace Api.Validation
 {
-    public class BillValidator : AbstractValidator<Bill>
+    public class BillValidator : AbstractValidator<BillDto>
     {
         public BillValidator()
         {
