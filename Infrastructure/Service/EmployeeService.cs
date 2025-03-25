@@ -13,6 +13,11 @@ namespace Infrastructure.Service
             _employeeRepository = employeeRepository;
         }
 
+        public Employee GetByEmail(string email)
+        {
+            return GetAll().FirstOrDefault(x => x.Email == email);
+        }
+
         public Employee GetByName(string name)
         {
             return GetAll().FirstOrDefault(x => x.Name == name);

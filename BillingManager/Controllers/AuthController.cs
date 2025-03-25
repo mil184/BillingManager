@@ -1,6 +1,7 @@
 ﻿using Domain.Model;
 using Domain.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
 
 namespace Api.Controllers
 {
@@ -8,27 +9,28 @@ namespace Api.Controllers
     [Route("api/authentication")]
     public class AuthController : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
         private readonly ITokenService _tokenService;
+        private readonly IAuthService _authService;
 
-        public AuthController(IEmployeeService employeeService, ITokenService tokenService)
+        public AuthController(ITokenService tokenService, IAuthService authService)
         {
-            _employeeService = employeeService;
             _tokenService = tokenService;
+            _authService = authService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login(string name)
+        public IActionResult Login(string email, string password)
         {
-            Employee employee = _employeeService.GetByName(name);
-
-            if (employee == null)
+            try
             {
-                return Unauthorized();
+                Employee employee = _authService.LogIn(email, password);
+                var token = _tokenService.GenerateToken(employee);
+                return Ok(new { Token = token });
             }
-
-            var token = _tokenService.GenerateToken(employee);
-            return Ok(new { Token = token });
+            catch (AuthenticationException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
     }
 }

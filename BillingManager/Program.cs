@@ -31,6 +31,7 @@ builder.Services.AddScoped<IBillService, BillService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICurrencyExchangeService, CurrencyExchangeService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<IBillPriceLimitService, BillPriceLimitService>();
 builder.Services.AddHttpClient<ICurrencyExchangeService, CurrencyExchangeService>();

@@ -4,6 +4,7 @@ namespace Domain.Service
 {
     public interface IEmployeeService
     {
+        Employee GetByEmail(string email);
         Employee GetByName(string name);
         Employee Create(Employee employee);
         void Delete(Guid id);
