@@ -30,17 +30,18 @@ namespace Api.Controllers
 
         [HttpPut]
         [Route("/card-payment")]
-        public IActionResult PayWithCard(PaymentDto payment)
+        public async Task<ActionResult> PayWithCard(PaymentDto payment)
         {
             var validationResult = _paymentCardValidator.Validate(payment);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+                var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(errorMessages);
             }
 
             if (!_paymentService.CheckPaymentCardInformation(payment.Pan, payment.Cvv))
             {
-                return StatusCode(401, "Invalid card details.");
+                return BadRequest("Unknown information.");
             }
 
             Bill bill = _billService.GetById(GuidHelper.GetGuidFromString(payment.BillId));
@@ -77,7 +78,6 @@ namespace Api.Controllers
             };
 
             var createdBill = _billService.Create(bill);
-            //return CreatedAtAction(nameof(GetById), new { id = createdBill.Id }, createdBill);
             return Ok(createdBill);
         }
 

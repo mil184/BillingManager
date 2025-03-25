@@ -45,14 +45,39 @@ namespace Infrastructure.Service
         public void Delete(Guid id)
         {
             var bill = _billRepository.GetById(id);
-            if (bill != null)
-                _billRepository.Delete(bill);
+
+            if (bill == null)
+            {
+                throw new BillIsNullException("Bill is null.");
+            }
+
+            _billRepository.Delete(bill);
         }
 
         public IEnumerable<Bill> GetAll() => _billRepository.GetAll();
 
-        public Bill? GetById(Guid id) => _billRepository.GetById(id);
+        public Bill? GetById(Guid id)
+        {
+            var bill = _billRepository.GetById(id);
 
-        public void Update(Bill bill) => _billRepository.Update(bill);
+            if (bill == null)
+            {
+                throw new BillIsNullException("Bill is null.");
+            }
+
+            return bill;
+        }
+
+        public void Update(Bill bill)
+        {
+            var oldBill = _billRepository.GetById(bill.Id);
+
+            if (oldBill == null)
+            {
+                throw new BillIsNullException("Bill is null.");
+            }
+
+            _billRepository.Update(bill);
+        }
     }
 }

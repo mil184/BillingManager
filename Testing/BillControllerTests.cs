@@ -4,7 +4,6 @@ using Api.Validation;
 using Domain.Model;
 using Domain.Service;
 using FakeItEasy;
-using Infrastructure.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,8 +22,6 @@ namespace Testing
         private readonly BillController _controller;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        private readonly ITokenService _tokenService;
 
         public BillControllerTests()
         {
@@ -45,8 +42,6 @@ namespace Testing
             A.CallTo(() => _httpContextAccessor.HttpContext).Returns(httpContext);
 
             _controller = new BillController(_billService, _paymentService, _paymentCardValidator, _billValidator);
-
-            _tokenService = new TokenService();
         }
 
         [Fact]
@@ -221,5 +216,23 @@ namespace Testing
             var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
         }
 
+        [Fact]
+        public void BillController_PayWithCard_ReturnOk()
+        {
+            // Arrange
+            Guid billId = Guid.NewGuid();
+            PaymentDto paymentDto = new PaymentDto { Pan = "4111111111111111", Cvv = "123", BillId = billId.ToString() };
+            Bill bill = new Bill { Id = billId, BillNumber = "12345" };
+            var validationResult = _paymentCardValidator.Validate(paymentDto);
+
+            A.CallTo(() => _paymentService.CheckPaymentCardInformation(paymentDto.Pan, paymentDto.Cvv)).Returns(true);
+            A.CallTo(() => _billService.GetById(billId)).Returns(bill);
+
+            // Act
+            var result = _controller.PayWithCard(paymentDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkResult>(result.Result);
+        }
     }
 }

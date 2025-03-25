@@ -12,10 +12,6 @@ namespace Infrastructure.Service
     {
         private readonly IConfiguration _configuration;
 
-        public TokenService()
-        {
-        }
-
         public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
