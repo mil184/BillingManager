@@ -33,7 +33,13 @@ namespace Api.Controllers
         public ActionResult<BillItem> GetById(Guid id)
         {
             var billItem = _billItemService.GetById(id);
-            return billItem != null ? Ok(billItem) : NotFound();
+
+            if (billItem == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(billItem);
         }
 
         [HttpPost]
@@ -63,19 +69,32 @@ namespace Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "CashRegisterOfficer")]
-        public IActionResult Update(Guid id, BillItem billItem)
+        public ActionResult Update(Guid id, BillItemDto billItemDto)
         {
-            if (id != billItem.Id) return BadRequest();
+            var billItem = _billItemService.GetById(id);
+
+            if (billItem == null)
+            {
+                return NotFound();
+            }
+
             _billItemService.Update(billItem);
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "CashRegisterOfficer")]
-        public IActionResult Delete(Guid id)
+        public ActionResult Delete(Guid id)
         {
+            var billItem = _billItemService.GetById(id);
+
+            if (billItem == null)
+            {
+                return NotFound();
+            }
+
             _billItemService.Delete(id);
-            return NoContent();
+            return Ok();
         }
     }
 }

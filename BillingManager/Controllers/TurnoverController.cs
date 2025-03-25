@@ -36,7 +36,6 @@ namespace Api.Controllers
             };
 
             var createdBillPriceLimit = _billPriceLimitService.Create(billPriceLimit);
-            //return CreatedAtAction(nameof(GetNewest), createdBillPriceLimit);
             return Ok(createdBillPriceLimit);
         }
 
@@ -44,7 +43,13 @@ namespace Api.Controllers
         public ActionResult<BillPriceLimit> GetNewest()
         {
             var bill = _billPriceLimitService.GetNewest();
-            return bill != null ? Ok(bill) : NotFound();
+
+            if (bill == null)
+            {
+                NotFound();
+            }
+
+            return Ok(bill);
         }
     }
 }
